@@ -112,6 +112,7 @@ This one was interesting mostly because of how many sources it tried and how man
 ## Problems I ran into
 
 Problem 1 — whatweb gave "execution expired" on networkwalks.com
+
 My first run of whatweb networkwalks.com just failed outright:
 
 ERROR Opening: https://networkwalks.com - execution expired
@@ -120,21 +121,26 @@ ERROR Opening: http://networkwalks.com - execution expired
 At first I assumed something was wrong with my Kali setup or my network connection, since whatweb normally returns a full breakdown of the site's stack. Turns out this is a timeout — whatweb gives the target a fixed window to respond, and if the site (or whatever's in front of it, like a WAF) is slow to respond to an automated, non-browser-looking request, whatweb just gives up and reports it as expired rather than hanging indefinitely. Re-running it a bit later worked fine and returned the expected WordPress/Bootstrap/Apache fingerprint. Lesson here: a failed scan isn't always a broken tool — sometimes it's the target itself being slow or picky about how the request looks.
 
 Problem 2 — wafw00f hit connection timeouts but still worked
+
 Similar story with wafw00f. The output showed an actual connection error midway through:
 
 ERROR:wafw00f:Something went wrong HTTPSConnectionPool(host='networkwalks.com', port=443): Max retries exceeded ... ConnectTimeoutError
+
 This happened while wafw00f was sending one of its deliberately malformed/attack-looking test requests (you can see it's throwing things like a fake XSS payload and a SQL injection string at the URL to see how the server reacts). My first read was "okay, this crashed." But it kept going and still produced a result:
 
 [+] Generic Detection results:
 [*] The site https://networkwalks.com seems to be behind a WAF or some sort of security solution
 [~] Reason: The response was different when the request wasn't made from a browser.
 [~] Reason: Normal response code is "200", while the response code to a modified request is "406"
+
 So the timeout on that one specific malicious-looking request was actually evidence in itself — it strongly suggests the WAF is specifically blocking or dropping suspicious-looking traffic at the network level (hence the hang), rather than returning a clean rejection every time. wafw00f's generic detection logic picked up on the status code difference regardless and still correctly flagged that a WAF was present, just without naming the exact product this time.
 
 Problem 3 — theHarvester with "-b all" mostly returned "Missing API key" errors
+
 This was the biggest one. Running:
 
 theHarvester -d microsoft.com -l 50 -b all
+
 produced page after page of errors like:
 
 [!] Missing API key for bevigil.
@@ -145,6 +151,7 @@ produced page after page of errors like:
 [!] Missing API key for criminalip.
 [!] Missing API key for Dehashed.
 [!] Missing API key for DNSDumpster.
+
 and this list kept going for most of the "all sources" list. I initially thought I'd broken something during install, but reading into it, this is completely expected out of the box: theHarvester only ships with free, keyless sources enabled by default (things like Baidu, DuckDuckGo, crt.sh, that sort of thing), while a lot of the more powerful sources — Shodan-adjacent tools, breach databases, commercial OSINT APIs — need you to register for your own API key and drop it into /etc/theHarvester/api-keys.yaml before they'll work. Running with -b all just surfaces every source it knows about and tells you honestly which ones it couldn't use. So for this task, the Baidu-only run (Task 1) actually returned more usable signal than the "all sources" run did, simply because Baidu doesn't require a key and most of the others in the "all" list do.
 ---
 
