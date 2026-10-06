@@ -152,11 +152,14 @@ and this list kept going for most of the "all sources" list. I initially thought
 
 
 Passive recon really doesn't touch the target. Every tool here just reads public information or sends normal-looking requests — nothing here would show up as an attack in a log the way a scan or exploit attempt would.
+
 A tool failing isn't always your fault. Both the whatweb timeout and the wafw00f connection error looked like broken setups at first, but they were actually the target (or its WAF) behaving a certain way — which is itself information.
+
 "All sources" doesn't mean "all working." theHarvester happily tells you which sources it can't use without an API key rather than silently skipping them, which is actually useful once you understand what you're looking at.
+
 Small details add up fast. A /wp-json/ link header, a WordPress version number, a WAF fingerprint, and a handful of DNS records don't individually seem like much, but stacked together they give a surprisingly complete profile of a target before you've run a single scan against it.
-This is also exactly how defenders audit themselves — running these same six tools against your own domain tells you what an attacker would see on day one, which is a pretty direct way to figure out what you're leaking
----
+
+This is also exactly how defenders audit themselves — running these same six tools against your own domain tells you what an attacker would see on day one, which is a pretty direct way to figure out what you're leaking.
 
 ## Tools used
 
