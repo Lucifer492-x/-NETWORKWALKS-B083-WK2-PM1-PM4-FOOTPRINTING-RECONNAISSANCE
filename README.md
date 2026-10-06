@@ -153,9 +153,6 @@ produced page after page of errors like:
 [!] Missing API key for DNSDumpster.
 
 
-and this list kept going for most of the "all sources" list. I initially thought I'd broken something during install, but reading into it, this is completely expected out of the box: theHarvester only ships with free, keyless sources enabled by default (things like Baidu, DuckDuckGo, crt.sh, that sort of thing), while a lot of the more powerful sources — Shodan-adjacent tools, breach databases, commercial OSINT APIs — need you to register for your own API key and drop it into /etc/theHarvester/api-keys.yaml before they'll work. Running with -b all just surfaces every source it knows about and tells you honestly which ones it couldn't use. So for this task, the Baidu-only run (Task 1) actually returned more usable signal than the "all sources" run did, simply because Baidu doesn't require a key and most of the others in the "all" list do.
----
-
 
 ## What I took away from this week
 
